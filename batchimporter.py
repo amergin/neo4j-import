@@ -136,8 +136,7 @@ class DatasetImporter( object ):
 		self.createMysqlDumps()
 		self.createPatientBarcodeTSV()
 		self.createNodeFiles()
-		if( getEdgeIndexingEnabled( self.config ) ):
-			self.createEdgeFiles()
+		self.createEdgeFiles()
 		self.createNeoDB()
 		self.createInfoNodes()
 
@@ -386,6 +385,8 @@ class DatasetImporter( object ):
 		edgeName = "ASSOCIATION"
 		edge_tsv_file = open( getTSVEdgeFile(config), 'w' )
 
+		edgeIndexingEnabled = getEdgeIndexingEnabled( self.config )
+
 		# what columns to include to indices?
 		indexAttributes = ['pvalue', 'importance', 'correlation']
 		indexAttributes.sort()
@@ -401,10 +402,9 @@ class DatasetImporter( object ):
 
 			edge_file = open( getDumpEdgesFile(config, datalabel), 'r' )
 
-			dist_index_file = open( getTSVEdgeIndexFile(config, 'DISTANCE', datalabel), 'w')
-			#self.indexFiles['edges'].append( dist_index_file )
-			assoc_index_file = open( getTSVEdgeIndexFile(config, 'ASSOCIATION', datalabel), 'w')
-			#self.indexFiles['edges'].append( assoc_index_file )
+			if edgeIndexingEnabled:
+				dist_index_file = open( getTSVEdgeIndexFile(config, 'DISTANCE', datalabel), 'w')
+				assoc_index_file = open( getTSVEdgeIndexFile(config, 'ASSOCIATION', datalabel), 'w')
 
 			headerColumns = []
 			headerTypes = []
@@ -419,8 +419,9 @@ class DatasetImporter( object ):
 						headerTypes.append( h.split("__")[1] )
 
 					# write headers to index files
-					dist_index_file.write( "id" + "\t" )
-					assoc_index_file.write( "id" + "\t" )
+					if edgeIndexingEnabled:
+						dist_index_file.write( "id" + "\t" )
+						assoc_index_file.write( "id" + "\t" )
 
 					headerDict = dict( zip(headerColumns, headerTypes) )
 
@@ -429,18 +430,19 @@ class DatasetImporter( object ):
 							+ "\t".join( [ key + ":" + headerDict[key] for key in edgeAttributes ] ) + "\t" + "distance:int" + "\n" )
 						firstDataset = False
 
-					for lineno, (col, primtype) in enumerate( sorted( headerDict.items() ) ):
-						#edge_tsv_file.write( col + ":" + primtype + "\t" )
-						if col in indexAttributes:
-							dist_index_file.write( col )#+ ":" + primtype )
-							assoc_index_file.write( col )#+ ":" + primtype )
-							if( lineno != len( zip(headerColumns, headerTypes)) - 1 ):
-								dist_index_file.write( "\t" )
-								assoc_index_file.write( "\t" )
-							else:
-								assoc_index_file.write("\n")
-					dist_index_file.write("\tdistance\n")
-					continue	
+					if edgeIndexingEnabled:
+						for lineno, (col, primtype) in enumerate( sorted( headerDict.items() ) ):
+							#edge_tsv_file.write( col + ":" + primtype + "\t" )
+							if col in indexAttributes:
+								dist_index_file.write( col )#+ ":" + primtype )
+								assoc_index_file.write( col )#+ ":" + primtype )
+								if( lineno != len( zip(headerColumns, headerTypes)) - 1 ):
+									dist_index_file.write( "\t" )
+									assoc_index_file.write( "\t" )
+								else:
+									assoc_index_file.write("\n")
+						dist_index_file.write("\tdistance\n")
+					continue
 
 				lineDict = getLineDict( headerColumns, line )
 
@@ -489,19 +491,22 @@ class DatasetImporter( object ):
 					#	+ "\t" + "\t".join( ['%s' %(value) for key, value in sorted( lineDict.items() ) ] ) + "\n" )
 
 					# for relationships the indexing starts from 0, not 1!
-					dist_index_file.write( str(tsv_lineno) + "\t" + "\t".join( [ lineDict[i] for i in indexAttributes ] ) + "\t" + str(distance) + "\n" )
-					assoc_index_file.write( str(tsv_lineno) + "\t" + "\t".join( [ lineDict[i] for i in indexAttributes ] ) + "\t" + str(distance) + "\n" )
+					if edgeIndexingEnabled:
+						dist_index_file.write( str(tsv_lineno) + "\t" + "\t".join( [ lineDict[i] for i in indexAttributes ] ) + "\t" + str(distance) + "\n" )
+						assoc_index_file.write( str(tsv_lineno) + "\t" + "\t".join( [ lineDict[i] for i in indexAttributes ] ) + "\t" + str(distance) + "\n" )
 				else:
 					# distance column is now empty!
 					edge_tsv_file.write( start + "\t" + stop + "\t" + edgeName + "\t" \
 						+ "\t".join( [ lineDict[i] for i in edgeAttributes ] ) + "\t" + "" + "\t" + "\n" )
-					assoc_index_file.write( str(tsv_lineno) + "\t" + "\t".join( [ lineDict[i] for i in indexAttributes ] ) + "\t" + "" + "\t" + "\n" )
+					if edgeIndexingEnabled:
+						assoc_index_file.write( str(tsv_lineno) + "\t" + "\t".join( [ lineDict[i] for i in indexAttributes ] ) + "\t" + "" + "\t" + "\n" )
 				# edge ids start from zero
 				tsv_lineno += 1
 
+			if edgeIndexingEnabled:
+				dist_index_file.close()
+				assoc_index_file.close()
 			edge_file.close()
-			dist_index_file.close()
-			assoc_index_file.close()
 		edge_tsv_file.close()
 		print "Edge files created."
 
