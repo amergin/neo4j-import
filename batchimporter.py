@@ -578,6 +578,15 @@ if __name__ == "__main__":
 
 	config = db_util.getConfig( config_file )
 	checkImportProgram(config)
+
+	if not os.path.exists( getBatchTSVPath( config ) ):
+		print "TSV directory does not exist, creating."
+		os.makedirs( getBatchTSVPath( config ) )
+
+	if not os.path.exists( getMysqlDumps( config ) ):
+		print "Dump directory does not exist, creating"
+		os.makedirs( getMysqlDumps( config ) )
+
 	print "Data import started at %s" %( str(datetime.datetime.now()) )
 
 	importer = DatasetImporter( config )
