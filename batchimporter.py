@@ -136,7 +136,8 @@ class DatasetImporter( object ):
 		self.createMysqlDumps()
 		self.createPatientBarcodeTSV()
 		self.createNodeFiles()
-		self.createEdgeFiles()
+		if( getEdgeIndexingEnabled( self.config ) ):
+			self.createEdgeFiles()
 		self.createNeoDB()
 		self.createInfoNodes()
 
