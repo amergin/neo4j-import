@@ -455,7 +455,7 @@ class DatasetImporter( object ):
 					try:
 						f1chr = int( f1chr[0] )
 						f2chr = int( f2chr[0] )
-						if( f1chr <= 22 and f2chr <= 22 and f1chr == f2chr ):
+						if( f1chr <= 24 and f2chr <= 24 and f1chr == f2chr ):
 							f2start = int( lineDict['f2start'] )
 							f2end = int( lineDict['f2end'] )
 							f1start = int( lineDict['f1start'] )
