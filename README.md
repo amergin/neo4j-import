@@ -1,4 +1,5 @@
 INSTALLATION
+------------------------------------------
 
 Dependencies:
 * latest version of Batch-import by Michael Hunger (https://github.com/jexp/batch-import)
@@ -8,13 +9,15 @@ Dependencies:
 	- Python bindings for Neo4j (https://github.com/neo4j/python-embedded) for storing meta nodes
 
 RUNNING THE SCRIPT
+------------------------------------------
 
 1. Modify the batch_import.config to your needs
 2. Run by issuing ./batchimporter.py batch_import.config
 3. Once finished, copy the resulting db directory to you neo4j data directory
 
 EXAMPLE RUN
-
+------------------------------------------
+```
 bash-4.1$ ./batchimporter.py batch_import.config
 Data import started at 2012-09-21 20:48:06.795819
 Creating MySQL dumps
@@ -46,7 +49,6 @@ Creating edge files for dataset 'brca_public_0613'
 Creating edge files for dataset 'crc_noroi_1807'
 Edge files created.
 Creating Neo4j Database
-------------------------------------------
 Using Existing Configuration File
 ..
 Importing 204099 Nodes took 38 seconds 
@@ -120,7 +122,6 @@ Importing 519 Done inserting into crc_noroi_1807_i_n_MIRN Index took 0 seconds
 Importing 164 Done inserting into crc_noroi_1807_i_n_SAMP Index took 0 seconds 
 
 Total import time: 489 seconds 
-------------------------------------------
 Finished creating Neo4j Database
 Creating info nodes
 Meta node created, id 204100
@@ -131,3 +132,4 @@ Import time 1096.31 seconds, 4 datasets
 bash-4.1$ du -csh targetdb/
 2.9G    targetdb/
 2.9G    total
+```
