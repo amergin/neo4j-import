@@ -137,6 +137,8 @@ bash-4.1$ du -csh targetdb/
 OTHER NOTES
 ------------------------------------------
 Copy the resulting directory, run in server mode and ensure the graph structure is loaded to high-level cache (including the property linked lists for each element). That is, set cache type to strong (http://docs.neo4j.org/chunked/stable/configuration-caches.html), set a high enough heap size and run cypher queries
+```
 START a=node(*) WHERE a.label? <> "A" RETURN COUNT(a);
 START a=relationship(*) WHERE a.pvalue? < 0 RETURN COUNT(a);
+```
 prior to using the graph demo. This will effectively touch every element in the database and their properties, ensuring that all elements and their properties are placed in the high-level cache.
